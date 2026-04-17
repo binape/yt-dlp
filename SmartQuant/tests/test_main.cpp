@@ -49,10 +49,9 @@ int main() {
     SmartQuant_DailyCloseRiskCheck();
     const auto after = SmartQuant_GetStatus();
     assert(after.daily_stat.trade_count == 0);
+    assert(after.daily_stat.daily_pnl == 0.0);
 
     SmartQuant_Destroy();
     assert(sold >= 0.0);
-    assert(!sold_all || sold_all);
-    assert(!alerted || alerted);
     return 0;
 }

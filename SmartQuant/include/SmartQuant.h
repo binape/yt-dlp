@@ -15,16 +15,18 @@ constexpr int MAX_CONSECUTIVE_LOSS = 3;
 constexpr int TRADE_COOLDOWN_SEC = 300;
 constexpr double VOLATILITY_BREAK = 0.008;
 constexpr double RSI_EXTREME_OVERSOLD = 20.0;
-constexpr int FRIDAY_CUTOUR_HOUR = 14;
-constexpr int FRIDAY_CUTOUR_MIN = 30;
+constexpr int FRIDAY_CUTOFF_HOUR = 14;
+constexpr int FRIDAY_CUTOFF_MIN = 30;
 constexpr int RECENT_HIGH_LOW_PERIOD = 20;
 constexpr int PREMIUM_HISTORY_PERIOD = 10;
 constexpr double PREMIUM_STD_TIMES = 1.5;
 constexpr double DIVERGENCE_PRICE_BUFFER = 1.005;
 constexpr double ATR_STOP_MULTIPLIER = 1.8;
 constexpr double MIN_TRADE_VOLUME = 50000000.0;
-constexpr int TIME_SYNC_THRESHOLD = 2;
+constexpr int TIME_SYNC_THRESHOLD = 2;  // seconds
 constexpr std::size_t MAX_CACHE_LEN = 60;
+constexpr double MIN_VALUE_EPSILON = 1e-9;
+constexpr double REGRESSION_SINGULAR_THRESHOLD = 1e-12;
 
 enum class MarketState {
     RANGING,
@@ -117,4 +119,3 @@ void SmartQuant_DailyCloseRiskCheck();
 EngineStatus SmartQuant_GetStatus();
 
 }  // namespace SmartQuant
-

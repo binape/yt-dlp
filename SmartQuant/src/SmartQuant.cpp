@@ -225,7 +225,7 @@ private:
                     pivot = row;
                 }
             }
-            if (std::abs(m[pivot][col]) < 1e-12) {
+            if (std::abs(m[pivot][col]) < REGRESSION_SINGULAR_THRESHOLD) {
                 return;
             }
             std::swap(m[col], m[pivot]);
@@ -277,7 +277,7 @@ private:
         }
         const auto start = v.size() > lookback ? v.size() - lookback : 1;
         for (std::size_t i = start; i + 1 < v.size(); ++i) {
-            if (v[i] <= v[i - 1] && v[i] <= v[i + 1]) {
+            if ((v[i] < v[i - 1] && v[i] <= v[i + 1]) || (v[i] <= v[i - 1] && v[i] < v[i + 1])) {
                 out.push_back(i);
             }
         }
@@ -291,7 +291,7 @@ private:
         }
         const auto start = v.size() > lookback ? v.size() - lookback : 1;
         for (std::size_t i = start; i + 1 < v.size(); ++i) {
-            if (v[i] >= v[i - 1] && v[i] >= v[i + 1]) {
+            if ((v[i] > v[i - 1] && v[i] >= v[i + 1]) || (v[i] >= v[i - 1] && v[i] > v[i + 1])) {
                 out.push_back(i);
             }
         }
@@ -411,12 +411,12 @@ private:
             return false;
         }
         return local->tm_wday == 5
-            && (local->tm_hour > FRIDAY_CUTOUR_HOUR
-                || (local->tm_hour == FRIDAY_CUTOUR_HOUR && local->tm_min >= FRIDAY_CUTOUR_MIN));
+            && (local->tm_hour > FRIDAY_CUTOFF_HOUR
+                || (local->tm_hour == FRIDAY_CUTOFF_HOUR && local->tm_min >= FRIDAY_CUTOFF_MIN));
     }
 
     bool Buy() {
-        const double max_share = (param_.TotalCapital * param_.MaxPositionRatio) / std::max(data_.etf_price, 1e-9);
+        const double max_share = (param_.TotalCapital * param_.MaxPositionRatio) / std::max(data_.etf_price, MIN_VALUE_EPSILON);
         if (position_share_ >= max_share) {
             return false;
         }
@@ -449,7 +449,7 @@ private:
             daily_stat_.consecutive_loss = 0;
         }
         position_share_ -= qty;
-        if (position_share_ <= 1e-9) {
+        if (position_share_ <= MIN_VALUE_EPSILON) {
             position_share_ = 0.0;
             avg_cost_ = 0.0;
         }
@@ -532,7 +532,9 @@ private:
             return TradeSignal::SIGNAL_HOLD;
         }
 
-        UpdateMappingByRegression();
+        if (data_.is_kline_closed) {
+            UpdateMappingByRegression();
+        }
 
         const double premium_buy = GetDynamicPremiumBuyThreshold();
         const double premium_sell = GetDynamicPremiumSellThreshold();
@@ -625,4 +627,3 @@ EngineStatus SmartQuant_GetStatus() {
 }
 
 }  // namespace SmartQuant
-

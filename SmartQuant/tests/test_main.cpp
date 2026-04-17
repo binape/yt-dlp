@@ -46,6 +46,30 @@ int main() {
     assert(status.position_share >= 0.0);
     assert(bought >= 0.0);
 
+    MarketData stale_md;
+    stale_md.timestamp = now - (TIME_SYNC_THRESHOLD + 10);
+    stale_md.london_gold_price = 550.0;
+    stale_md.etf_price = 1.1;
+    stale_md.fx_rate = 7.2;
+    stale_md.premium = -0.01;
+    stale_md.volume = 100000000.0;
+    stale_md.adx_60m = 30.0;
+    stale_md.ma20_slope_60m = 0.4;
+    stale_md.rsi = 18.0;
+    stale_md.atr = 0.01;
+    stale_md.volatility = 0.002;
+    stale_md.is_kline_closed = true;
+    SmartQuant_UpdateMarketData(stale_md);
+    assert(SmartQuant_GetSignal() == TradeSignal::SIGNAL_HOLD);
+
+    MarketData break_md = stale_md;
+    break_md.timestamp = now;
+    break_md.volatility = VOLATILITY_BREAK;
+    break_md.rsi = RSI_EXTREME_OVERSOLD;
+    SmartQuant_UpdateMarketData(break_md);
+    const auto broken = SmartQuant_GetStatus();
+    assert(broken.daily_stat.is_suspended);
+
     SmartQuant_DailyCloseRiskCheck();
     const auto after = SmartQuant_GetStatus();
     assert(after.daily_stat.trade_count == 0);

@@ -406,13 +406,20 @@ private:
             return false;
         }
         std::time_t ts = static_cast<std::time_t>(data_.timestamp);
-        const std::tm* local = std::localtime(&ts);
-        if (!local) {
+#if defined(_WIN32)
+        std::tm local_tm{};
+        if (localtime_s(&local_tm, &ts) != 0) {
             return false;
         }
-        return local->tm_wday == 5
-            && (local->tm_hour > FRIDAY_CUTOFF_HOUR
-                || (local->tm_hour == FRIDAY_CUTOFF_HOUR && local->tm_min >= FRIDAY_CUTOFF_MIN));
+#else
+        std::tm local_tm{};
+        if (localtime_r(&ts, &local_tm) == nullptr) {
+            return false;
+        }
+#endif
+        return local_tm.tm_wday == 5
+            && (local_tm.tm_hour > FRIDAY_CUTOFF_HOUR
+                || (local_tm.tm_hour == FRIDAY_CUTOFF_HOUR && local_tm.tm_min >= FRIDAY_CUTOFF_MIN));
     }
 
     bool Buy() {

@@ -1,0 +1,6 @@
+{
+  "name": "smartquant",
+  "version-string": "1.0.0",
+  "description": "SmartQuant static library for quantitative signal analysis",
+  "dependencies": []
+}
